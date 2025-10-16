@@ -2,14 +2,23 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import ContactMessage from "@/models/ContactMessage";
 import { v4 as uuidv4 } from "uuid";
+import { sanitizeInput } from "@/lib/sanitize";
 
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    const { name, message, fromEmail } = await req.json();
+    const body = await req.json();
+    const { name, message, fromEmail } = sanitizeInput(body);
 
+    // Field validation
     if (!name || !message || !fromEmail) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    // Optional: Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(fromEmail)) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
     const newMessage = new ContactMessage({

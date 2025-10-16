@@ -8,7 +8,6 @@ export default function ConditionalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // ✅ Safely handle potential `null` pathname
   const pathname = usePathname() ?? "";
 
   // ❌ Routes that should NOT use AppLayout
@@ -17,15 +16,20 @@ export default function ConditionalLayout({
     "/signup",
     "/admin/login",
     "/admin/dashboard",
+    "/admin/add-admin",
+    "/404",
+    "/not-found",
+    "/error",
   ];
 
-  const isNoLayoutRoute = noLayoutRoutes.includes(pathname);
+  // ✅ Hide layout for any route that starts with these
+  const isNoLayoutRoute = noLayoutRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
 
   if (isNoLayoutRoute) {
-    // ✅ Render children directly (no sidebar/layout)
     return <div className="min-h-screen">{children}</div>;
   }
 
-  // ✅ Default: wrap all other routes with AppLayout
   return <AppLayout>{children}</AppLayout>;
 }

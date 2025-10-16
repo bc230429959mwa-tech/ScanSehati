@@ -13,6 +13,7 @@
       "isolatedModules": true,
       "jsx": "preserve",
       "incremental": true,
+      "typeRoots": ["./types", "./node_modules/@types"],
       "plugins": [
         {
           "name": "next"
@@ -25,4 +26,5 @@
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/models/User.js", "src/app/settings/page.jsx", "src/api/admin/dashboard"],
     "exclude": ["node_modules"]
   }
+  
   
