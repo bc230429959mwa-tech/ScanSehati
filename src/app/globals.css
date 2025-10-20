@@ -83,3 +83,27 @@
     @apply bg-background text-foreground;
   }
 }
+/* Keep layout stable even when scrollbar appears */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px; /* thinner */
+}
+
+::-webkit-scrollbar-track {
+  background:white; /* dark bg to match site background */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color:white ; /* your teal color */
+  border-radius: 5px;
+  border: 1px solid #0F172A; /* blends with background */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #d3ffff; /* slightly lighter teal on hover */
+}
+

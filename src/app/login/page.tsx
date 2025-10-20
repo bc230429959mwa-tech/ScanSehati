@@ -84,7 +84,7 @@ function LoginPageInner() {
             <div>
               <input
                 type="text"
-                placeholder="Username or Email"
+                placeholder="Username"
                 className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -111,7 +111,12 @@ function LoginPageInner() {
               {loading ? "Logging in..." : "Login"}
             </button>
 
-            <p className="text-sm text-gray-200 text-center">
+            {/* Add this info note just below the button */}
+            <p className="text-xs text-gray-300 text-center mt-2">
+              Each account has its own username, even if you used the same email for multiple roles.
+            </p>
+
+            <p className="text-sm text-gray-200 text-center mt-3">
               Don’t have an account?{" "}
               <a href="/signup" className="text-blue-300 hover:underline">
                 Sign up
