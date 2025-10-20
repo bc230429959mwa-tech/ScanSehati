@@ -13,19 +13,23 @@ export async function GET(
   const decodedId = decodeURIComponent(id);
 
   let patient = null;
-  let user = await User.findOne({ email: decodedId });
+  // ✅ Only find users who are patients
+  let user = await User.findOne({ email: decodedId, role: "patient" });
 
+  // If patient user found, look for their patient record
   if (user) {
     patient = await Patient.findOne({ userId: user._id });
   }
 
+  // Handle orphaned Patient docs (no linked user)
   if (!patient) {
     patient = await Patient.findOne({ userId: decodedId });
     if (!user && patient) {
-      user = await User.findById(patient.userId);
+      user = await User.findOne({ _id: patient.userId, role: "patient" });
     }
   }
 
+  // Auto-create patient record if not existing but user exists
   if (!patient && user) {
     patient = new Patient({
       userId: user._id,
@@ -63,7 +67,8 @@ export async function POST(
 
   const body = await req.json();
 
-  let user = await User.findOne({ email: decodedId });
+  // ✅ Again: only target patient role
+  let user = await User.findOne({ email: decodedId, role: "patient" });
   let patient = null;
 
   if (user) {

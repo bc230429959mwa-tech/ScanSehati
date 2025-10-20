@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google"; // ✅ built-in safe loader
 import "./globals.css";
 
 import { Toaster } from "@/app/components/ui/toaster";
 import NextAuthSessionProvider from "../SessionProvider";
-import ConditionalLayout from "@/app/components/layout/ConditionalLayout"; // 👈 new import
+import ConditionalLayout from "@/app/components/layout/ConditionalLayout";
 import PageLoader from "./components/layout/PageLoader";
+
+// ✅ Load Inter safely (Next.js hosts it locally)
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "ScanSehati",
   description: "AI-Powered Drug Interaction and Risk Prediction Platform",
   icons: {
-    icon: '/Capture.PNG', // <-- your favicon path
+    icon: '/Capture.PNG',
   },
 };
 
@@ -19,17 +27,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-body antialiased">
+      <body className={`${inter.className} font-body antialiased`}>
         <NextAuthSessionProvider>
-          <PageLoader/>
+          <PageLoader />
           <ConditionalLayout>{children}</ConditionalLayout>
           <Toaster />
         </NextAuthSessionProvider>

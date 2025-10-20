@@ -14,6 +14,7 @@ function LoginPageInner() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+
   useEffect(() => {
     const currentUrl = window.location.pathname;
     if (searchParams?.has("callbackUrl")) {
