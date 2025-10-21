@@ -142,45 +142,11 @@ export function InteractionDashboard() {
     fetchPatientByEmail();
   }, [session?.user?.email]);
 
-  // ---------- FETCH PATIENT (manual membership search) ----------
-  const handleFindPatient = async (query: string) => {
-    if (!query) {
-      setPatient(null);
-      setInteractions([]);
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const res = await fetch(`/api/patient/${encodeURIComponent(query)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.patient) {
-          setPatient(data.patient);
-          if (Array.isArray(data.patient.medications) && data.patient.medications.length > 0) {
-            await runInteractionCheck(data.patient.medications.map((m: Medication) => m.name));
-          } else {
-            setInteractions([]);
-          }
-          toast({ title: 'Patient Found', description: `Loaded record for ${data.patient.name || 'patient'}.` });
-        } else {
-          setPatient(null);
-          setInteractions([]);
-          toast({ variant: 'destructive', title: 'Not Found', description: 'No patient found with that membership number.' });
-        }
-      } else {
-        setPatient(null);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to fetch patient.' });
-      }
-    } catch (err) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Network error while fetching patient.' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
 
   // ---------- INTERACTION CHECK ----------
   const runInteractionCheck = async (drugList: string[]) => {
-    if (!drugList || drugList.length < 2) {
+    if (!drugList || drugList.length < 1) {
       setInteractions([]);
       return;
     }

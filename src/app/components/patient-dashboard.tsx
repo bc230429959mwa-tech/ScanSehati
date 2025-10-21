@@ -210,7 +210,7 @@ export function PatientDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>My Medications</CardTitle>
-            <CardDescription>Your current medications. Interaction alerts will show here.</CardDescription>
+            <CardDescription>Your current medications. Interaction between at least two medications will show here.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {medications.length === 0 && <div className="text-center py-8 text-muted-foreground">You have no medications saved.</div>}

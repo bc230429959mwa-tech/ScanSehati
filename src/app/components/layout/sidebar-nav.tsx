@@ -31,7 +31,6 @@ export function AppSidebarNav() {
 
   const commonItems = [
     { href: '/chatbot', label: 'AI Chatbot', icon: MessageCircle },
-    { href: '/interaction-check', label: 'Interaction Check', icon: HeartPulse },
     { href: '/how-it-works', label: 'How It Works', icon: Users },
     { href: '/about-us', label: 'About Us', icon: Info },
   ];
@@ -42,6 +41,7 @@ export function AppSidebarNav() {
     patient: [
       { href: '/', label: 'Patient Dashboard', icon: LayoutDashboard },
       { href: '/for-patients', label: 'Patient Overview', icon: Users },
+      { href: '/interaction-check', label: 'Interaction Check', icon: HeartPulse },
     ],
   };
 
