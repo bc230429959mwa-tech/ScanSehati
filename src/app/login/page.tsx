@@ -8,7 +8,7 @@ function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const callbackUrl = searchParams?.get("callbackUrl") || "/";
+  const callbackUrl = searchParams?.get("callbackUrl") || "/patient-home";
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -45,8 +45,9 @@ function LoginPageInner() {
     const role = session?.user?.role;
 
     if (role === "doctor") router.push("/for-doctors");
-    else if (role === "pharmacist") router.push("/for-pharmacists");
-    else router.replace(callbackUrl);
+else if (role === "pharmacist") router.push("/for-pharmacists");
+else if (role === "patient") router.push("/patient-home");
+else router.replace(callbackUrl);
 
     setLoading(false);
   };

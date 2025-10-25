@@ -39,7 +39,7 @@ export function AppSidebarNav() {
     doctor: [{ href: '/for-doctors', label: 'Doctor Dashboard', icon: Stethoscope }],
     pharmacist: [{ href: '/for-pharmacists', label: 'Pharmacist Dashboard', icon: Stethoscope }],
     patient: [
-      { href: '/', label: 'Patient Dashboard', icon: LayoutDashboard },
+      { href: '/patient-home', label: 'Patient Dashboard', icon: LayoutDashboard },
       { href: '/for-patients', label: 'Patient Overview', icon: Users },
       { href: '/interaction-check', label: 'Interaction Check', icon: HeartPulse },
     ],

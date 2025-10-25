@@ -58,6 +58,7 @@ export default withAuth(
 
 export const config = {
   matcher: [
+    "/patient-home/:path*",
     "/dashboard/:path*",
     "/for-doctors/:path*",
     "/for-pharmacists/:path*",

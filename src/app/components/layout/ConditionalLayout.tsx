@@ -10,21 +10,21 @@ export default function ConditionalLayout({
 }) {
   const pathname = usePathname() ?? "";
 
-  // ❌ Routes that should NOT use AppLayout
+  // Routes that should NOT use AppLayout (no sidebar)
   const noLayoutRoutes = [
+    "/",
     "/login",
     "/signup",
-    "/admin/login",
     "/admin/dashboard",
+    "/admin/login",
     "/admin/add-admin",
     "/404",
     "/not-found",
     "/error",
   ];
 
-  // ✅ Hide layout for any route that starts with these
   const isNoLayoutRoute = noLayoutRoutes.some((route) =>
-    pathname.startsWith(route)
+    route === "/" ? pathname === "/" : pathname.startsWith(route)
   );
 
   if (isNoLayoutRoute) {
