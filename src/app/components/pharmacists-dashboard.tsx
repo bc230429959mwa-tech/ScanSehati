@@ -1,6 +1,8 @@
 'use client';
 import React, { useEffect, useState, useMemo } from 'react';
 import { CheckCircle, XCircle, PackageCheck } from 'lucide-react';
+import PharmaDocMsg from './PharmaDocMsg';
+import PharmaPatientHistory from './PharmaPatientHistory';
 
 interface Prescription {
   uuid: string;
@@ -16,6 +18,7 @@ interface Prescription {
   rxNumber: string;
   status: string;
   noteForPharmacist?: string;
+  username: string;
 }
 
 const PharmacistDashboard: React.FC = () => {
@@ -23,8 +26,7 @@ const PharmacistDashboard: React.FC = () => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const pharmacyId = 'pharmacy-001';
-
-  // Helper functions (useEffect, useMemo, getStatusBadgeClasses, updateStatus)
+  const [selectedPatientUsername, setSelectedPatientUsername] = useState<string | null>(null);
 
   const getStatusBadgeClasses = (status: string) => {
     switch (status) {
@@ -42,7 +44,6 @@ const PharmacistDashboard: React.FC = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, pharmacyId }),
     });
-
     if (res.ok) {
       setPrescriptions((prev) =>
         prev.map((p) => (p.uuid === uuid ? { ...p, status } : p))
@@ -70,14 +71,17 @@ const PharmacistDashboard: React.FC = () => {
     );
   }, [query, prescriptions]);
 
-  if (loading) return <div className="text-center py-10 text-lg text-gray-700">Loading prescriptions...</div>;
+  if (loading)
+    return (
+      <div className="text-center py-10 text-lg text-gray-700">
+        Loading prescriptions...
+      </div>
+    );
 
   return (
-    // Outer container ensures internal component content is constrained
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-7xl mx-auto space-y-10">
-
-        {/* Header - Modernized */}
+        {/* Header */}
         <header className="text-center space-y-2 pt-4 pb-2 bg-white rounded-2xl shadow-lg border border-gray-100">
           <h1 className="text-4xl font-extrabold text-teal-700 tracking-tight">
             Pharmacy Dispense Panel 💊
@@ -87,10 +91,8 @@ const PharmacistDashboard: React.FC = () => {
           </p>
         </header>
 
-        {/* Prescription Card Container */}
+        {/* Prescriptions Table */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6">
-          
-          {/* Header and Search */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
             <h3 className="font-semibold text-2xl text-gray-800 mb-3 sm:mb-0">
               Incoming Prescriptions
@@ -103,142 +105,120 @@ const PharmacistDashboard: React.FC = () => {
             />
           </div>
 
-          {/* ------------------------------------------------------------------- */}
-          {/* MOBILE/CARD VIEW (visible below 'md' breakpoint) */}
-          {/* ------------------------------------------------------------------- */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            {filtered.length > 0 ? (
-              filtered.map((rx) => (
-                <div key={rx.uuid} className="p-4 border border-gray-200 rounded-xl shadow-sm bg-white space-y-3">
-                  <div className="flex justify-between items-start border-b pb-2">
-                    <p className="font-bold text-lg text-teal-700">{rx.patientName}</p>
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusBadgeClasses(rx.status)}`}>
-                      {rx.status}
-                    </span>
-                  </div>
-                  
-                  <div className="text-sm space-y-1">
-                    <p className="font-medium text-gray-800">
-                      Drug: <span className="font-normal text-gray-600">{rx.drug} ({rx.dosage})</span>
-                    </p>
-                    <p className="text-gray-700">
-                      Rx #: <span className="font-mono">{rx.rxNumber}</span>
-                    </p>
-                    <p className="text-gray-700">
-                      Qty: <span className="font-normal">{rx.pills} ({rx.form})</span>
-                    </p>
-                  </div>
-                  
-                  <div className="flex justify-end pt-2 border-t mt-3">
-                    <div className="space-x-2">
-                      <button
-                        onClick={() => updateStatus(rx.uuid, 'Ready')}
-                        className={`p-2 rounded-full transition ${rx.status === 'PickedUp' || rx.status === 'Cancelled' ? 'text-gray-400 cursor-not-allowed' : 'text-green-600 hover:bg-green-100'}`}
-                        title="Mark as Ready"
-                        disabled={rx.status === 'PickedUp' || rx.status === 'Cancelled'}
-                      >
-                        <PackageCheck size={20} />
-                      </button>
-                      <button
-                        onClick={() => updateStatus(rx.uuid, 'PickedUp')}
-                        className={`p-2 rounded-full transition ${rx.status === 'PickedUp' || rx.status === 'Cancelled' ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-100'}`}
-                        title="Mark as Picked Up"
-                        disabled={rx.status === 'PickedUp' || rx.status === 'Cancelled'}
-                      >
-                        <CheckCircle size={20} />
-                      </button>
-                      <button
-                        onClick={() => updateStatus(rx.uuid, 'Cancelled')}
-                        className={`p-2 rounded-full transition ${rx.status === 'Cancelled' ? 'text-gray-400 cursor-not-allowed' : 'text-red-600 hover:bg-red-100'}`}
-                        title="Cancel"
-                        disabled={rx.status === 'Cancelled'}
-                      >
-                        <XCircle size={20} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center py-4 text-gray-500">No prescriptions found.</p>
-            )}
-          </div>
-          
-          {/* ------------------------------------------------------------------- */}
-          {/* DESKTOP/TABLE VIEW (visible from 'md' breakpoint and up) */}
-          {/* ------------------------------------------------------------------- */}
+          {/* Table */}
           <div className="hidden md:block overflow-x-auto w-full">
             <table className="min-w-full text-sm divide-y divide-gray-200">
               <thead>
                 <tr className="bg-teal-50 text-teal-800 text-left font-semibold uppercase tracking-wider">
-                  <th className="p-2 whitespace-nowrap rounded-tl-lg">Rx #</th>
-                  <th className="p-2 whitespace-nowrap">Patient</th>
-                  <th className="p-2 whitespace-nowrap">Drug</th>
-                  <th className="p-2 hidden lg:table-cell whitespace-nowrap">Dosage</th>
-                  <th className="p-2 hidden md:table-cell whitespace-nowrap">Qty</th>
-                  <th className="p-2 hidden xl:table-cell whitespace-nowrap">Freq</th>
-                  <th className="p-2 hidden xl:table-cell whitespace-nowrap">Doctor</th>
-                  <th className="p-2 whitespace-nowrap">Status</th>
+                  <th className="p-2">Rx #</th>
+                  <th className="p-2">Patient</th>
+                  <th className="p-2">Drug</th>
+                  <th className="p-2 hidden lg:table-cell">Dosage</th>
+                  <th className="p-2 hidden md:table-cell">Qty</th>
+                  <th className="p-2 hidden xl:table-cell">Freq</th>
+                  <th className="p-2 hidden xl:table-cell">Doctor</th>
+                  <th className="p-2">Status</th>
                   <th className="p-2 hidden lg:table-cell">Note</th>
-                  <th className="p-2 text-right rounded-tr-lg">Actions</th>
+                  <th className="p-2 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((rx, i) => (
-                  <tr key={rx.uuid} className={i % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-100 hover:bg-gray-200'}>
-                    <td className="p-2 font-mono font-medium text-teal-600 whitespace-nowrap">{rx.rxNumber}</td>
-                    <td className="p-2 font-medium text-gray-800 whitespace-nowrap">{rx.patientName}</td>
-                    <td className="p-2 text-gray-700 whitespace-nowrap">{rx.drug}</td>
-                    <td className="p-2 hidden lg:table-cell whitespace-nowrap">{rx.dosage}</td>
-                    <td className="p-2 hidden md:table-cell whitespace-nowrap">{rx.pills} ({rx.form})</td>
-                    <td className="p-2 hidden xl:table-cell whitespace-nowrap">{rx.frequency}</td>
-                    <td className="p-2 hidden xl:table-cell whitespace-nowrap">Dr. {rx.doctorName}</td>
-                    <td className="p-2 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClasses(rx.status)}`}>
+                  <tr
+                    key={rx.uuid}
+                    onClick={() =>
+                      setSelectedPatientUsername((prev) =>
+                        prev === rx.username ? null : rx.username
+                      )
+                    }
+                    className={`cursor-pointer transition ${
+                      selectedPatientUsername === rx.username
+                        ? 'bg-blue-100 ring-2 ring-teal-400'
+                        : i % 2 === 0
+                        ? 'bg-white hover:bg-gray-50'
+                        : 'bg-gray-50 hover:bg-gray-100'
+                    }`}
+                  >
+                    <td className="p-2 font-mono font-medium text-teal-600">
+                      {rx.rxNumber}
+                    </td>
+                    <td className="p-2 font-medium text-gray-800">{rx.patientName}</td>
+                    <td className="p-2 text-gray-700">{rx.drug}</td>
+                    <td className="p-2 hidden lg:table-cell">{rx.dosage}</td>
+                    <td className="p-2 hidden md:table-cell">
+                      {rx.pills} ({rx.form})
+                    </td>
+                    <td className="p-2 hidden xl:table-cell">{rx.frequency}</td>
+                    <td className="p-2 hidden xl:table-cell">Dr. {rx.doctorName}</td>
+                    <td className="p-2">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClasses(
+                          rx.status
+                        )}`}
+                      >
                         {rx.status}
                       </span>
                     </td>
                     <td className="p-2 hidden lg:table-cell text-gray-500 italic max-w-xs truncate">
                       {rx.noteForPharmacist || '-'}
                     </td>
-                    <td className="p-2 text-right space-x-1 whitespace-nowrap">
+                    <td className="p-2 text-right space-x-1">
                       <button
-                        onClick={() => updateStatus(rx.uuid, 'Ready')}
-                        className={`p-1 rounded-full transition ${rx.status === 'PickedUp' || rx.status === 'Cancelled' ? 'text-gray-400 cursor-not-allowed' : 'text-green-600 hover:bg-green-100'}`}
-                        title="Mark as Ready"
-                        disabled={rx.status === 'PickedUp' || rx.status === 'Cancelled'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateStatus(rx.uuid, 'Ready');
+                        }}
+                        className="p-1 rounded-full text-green-600 hover:bg-green-100"
                       >
                         <PackageCheck size={18} />
                       </button>
                       <button
-                        onClick={() => updateStatus(rx.uuid, 'PickedUp')}
-                        className={`p-1 rounded-full transition ${rx.status === 'PickedUp' || rx.status === 'Cancelled' ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-100'}`}
-                        title="Mark as Picked Up"
-                        disabled={rx.status === 'PickedUp' || rx.status === 'Cancelled'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateStatus(rx.uuid, 'PickedUp');
+                        }}
+                        className="p-1 rounded-full text-blue-600 hover:bg-blue-100"
                       >
                         <CheckCircle size={18} />
                       </button>
                       <button
-                        onClick={() => updateStatus(rx.uuid, 'Cancelled')}
-                        className={`p-1 rounded-full transition ${rx.status === 'Cancelled' ? 'text-gray-400 cursor-not-allowed' : 'text-red-600 hover:bg-red-100'}`}
-                        title="Cancel"
-                        disabled={rx.status === 'Cancelled'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateStatus(rx.uuid, 'Cancelled');
+                        }}
+                        className="p-1 rounded-full text-red-600 hover:bg-red-100"
                       >
                         <XCircle size={18} />
                       </button>
                     </td>
                   </tr>
                 ))}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={10} className="text-center py-8 text-lg text-gray-500">
-                      ✅ No prescriptions found matching your criteria.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Patient History Section */}
+        {selectedPatientUsername && (
+          <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6">
+            {/* Close (X) Button */}
+            <button
+              onClick={() => setSelectedPatientUsername(null)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition"
+              title="Close patient details"
+            >
+              ✖
+            </button>
+            <PharmaPatientHistory patientUsername={selectedPatientUsername} />
+          </div>
+        )}
+
+        {/* Messaging Section */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6">
+          <h3 className="font-semibold text-2xl text-gray-800 mb-4 border-b pb-4">
+            Doctor/Patient Messaging 💬
+          </h3>
+          <PharmaDocMsg />
         </div>
       </div>
     </div>

@@ -13,5 +13,5 @@ const messageSchema = new Schema(
   { timestamps: true }
 );
 
-const Message = models.Message || model("Message", messageSchema);
-export default Message;
+const PatientMessage = models.PatientMessage || model("PatientMessage", messageSchema);
+export default PatientMessage;

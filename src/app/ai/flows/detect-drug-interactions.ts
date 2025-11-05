@@ -12,6 +12,7 @@
 import {ai} from '@/app/ai/genkit';
 import {z} from 'genkit';
 
+// --- INPUT SCHEMA ---
 const DetectDrugInteractionsInputSchema = z.object({
   drugList: z
     .array(z.string())
@@ -19,6 +20,7 @@ const DetectDrugInteractionsInputSchema = z.object({
 });
 export type DetectDrugInteractionsInput = z.infer<typeof DetectDrugInteractionsInputSchema>;
 
+// --- INTERACTION SCHEMA (The specific type we need to export) ---
 const InteractionSchema = z.object({
   drugA: z.string().describe('The name of the first drug.'),
   drugB: z.string().describe('The name of the second drug.'),
@@ -28,16 +30,22 @@ const InteractionSchema = z.object({
   description: z.string().describe('A description of the interaction.'),
   alternatives: z.array(z.string()).describe('Alternative drug suggestions.'),
 });
+// 🎯 FIX: Export the type alias for the individual interaction item
+export type DrugInteraction = z.infer<typeof InteractionSchema>; 
 
+
+// --- OUTPUT SCHEMA ---
 const DetectDrugInteractionsOutputSchema = z.object({
   interactions: z.array(InteractionSchema).describe('A list of drug interactions.'),
 });
 export type DetectDrugInteractionsOutput = z.infer<typeof DetectDrugInteractionsOutputSchema>;
 
+// --- FLOW FUNCTION ---
 export async function detectDrugInteractions(input: DetectDrugInteractionsInput): Promise<DetectDrugInteractionsOutput> {
   return detectDrugInteractionsFlow(input);
 }
 
+// --- AI PROMPT DEFINITION (No changes needed here) ---
 const prompt = ai.definePrompt({
   name: 'detectDrugInteractionsPrompt',
   input: {schema: DetectDrugInteractionsInputSchema},
@@ -63,6 +71,7 @@ const prompt = ai.definePrompt({
   `,
 });
 
+// --- AI FLOW DEFINITION (No changes needed here) ---
 const detectDrugInteractionsFlow = ai.defineFlow(
   {
     name: 'detectDrugInteractionsFlow',

@@ -27,7 +27,7 @@ const PatientMessage: React.FC<PatientMessageProps> = ({ patientUsername }) => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await fetch('/api/doctors');
+        const res = await fetch('/api/users?role=doctor');
         const data = await res.json();
         setDoctors(data);
         if (data.length > 0) setSelectedDoctor(data[0].username);
@@ -71,6 +71,7 @@ const PatientMessage: React.FC<PatientMessageProps> = ({ patientUsername }) => {
         <CardTitle>Send Message to Doctor</CardTitle>
         <CardDescription>
           Send your issue or query to your doctor. Your doctor can review your message and send you a prescription if needed.
+          Please mention all related symptoms and relevant information in your message(e.g., duration, severity, weight, gender etc.).
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

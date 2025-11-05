@@ -10,12 +10,22 @@ export default function SignupPage() {
     email: "",
     password: "",
     role: "patient",
+    dob: "",
+    licenseNumber: "",
+    qualification: "",
+    workplace: "",
+    verificationDoc: "",
+    confirmInfo: false,
   });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type, checked } = e.target as any;
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,6 +39,24 @@ export default function SignupPage() {
 
     if (form.password.length < 8 || form.password.length > 20) {
       setError("Password must be between 8 and 20 characters long.");
+      return;
+    }
+
+    if (!form.confirmInfo) {
+      setError("You must confirm that your information is true.");
+      return;
+    }
+
+    if (
+      (form.role === "doctor" || form.role === "pharmacist") &&
+      (!form.licenseNumber || !form.qualification)
+    ) {
+      setError("Please fill in all required professional details.");
+      return;
+    }
+
+    if (form.role === "patient" && !form.dob) {
+      setError("Please enter your date of birth.");
       return;
     }
 
@@ -63,10 +91,12 @@ export default function SignupPage() {
             <span className="text-blue-400">Scan</span>
             <span className="text-green-400">Sehati</span>
           </h1>
-          <p className="text-xl font-medium mb-2">Join our digital healthcare network</p>
+          <p className="text-xl font-medium mb-2">
+            Join our digital healthcare network
+          </p>
           <p className="text-gray-200 max-w-md">
-            Connect doctors, pharmacists & patients seamlessly — your one-stop solution for
-            healthcare collaboration.
+            Connect doctors, pharmacists & patients seamlessly — your one-stop
+            solution for healthcare collaboration.
           </p>
         </div>
 
@@ -84,84 +114,147 @@ export default function SignupPage() {
             )}
 
             {/* Role Dropdown */}
-            <div className="relative">
-              <label className="text-sm text-gray-200 block mb-1">Select Role</label>
-              <div className="relative">
-                <select
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  className="w-full appearance-none p-3 rounded-md bg-white/30 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-green-400 shadow-inner"
-                  required
-                >
-                  <option value="patient">👤 Patient</option>
-                  <option value="doctor">🩺 Doctor</option>
-                  <option value="pharmacist">💊 Pharmacist</option>
-                </select>
-                <div className="absolute right-3 top-3 text-gray-700 pointer-events-none">▼</div>
-              </div>
+            <div>
+              <label className="text-sm text-gray-200 block mb-1">
+                Select Role
+              </label>
+              <select
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full p-3 rounded-md bg-white/30 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-green-400 shadow-inner"
+                required
+              >
+                <option value="patient">👤 Patient</option>
+                <option value="doctor">🩺 Doctor</option>
+                <option value="pharmacist">💊 Pharmacist</option>
+              </select>
             </div>
 
             {/* Username */}
-            <div>
-              <input
-                type="text"
-                name="username"
-                placeholder="Username"
-                className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={form.username}
-                onChange={handleChange}
-                required
-                minLength={4}
-                maxLength={15}
-              />
-              <p className="text-xs text-gray-200 mt-1">
-                Username must be 4–15 characters long and unique.
-              </p>
-            </div>
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={form.username}
+              onChange={handleChange}
+              required
+            />
 
             {/* Full Name */}
-            <div>
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Full Name"
-                className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
-                value={form.fullName}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full Name"
+              className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+              value={form.fullName}
+              onChange={handleChange}
+              required
+            />
 
             {/* Email */}
-            <div>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
 
             {/* Password */}
-            <div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+
+            {/* Conditional Fields */}
+            {form.role === "patient" && (
+              <div>
+                <label className="text-sm text-gray-200 block mb-1">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  name="dob"
+                  value={form.dob}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+                />
+              </div>
+            )}
+
+            {(form.role === "doctor" || form.role === "pharmacist") && (
+              <>
+                <input
+                  type="text"
+                  name="licenseNumber"
+                  placeholder="Professional License Number"
+                  value={form.licenseNumber}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+                />
+                <input
+                  type="text"
+                  name="qualification"
+                  placeholder="Qualification (e.g., MBBS, Pharm.D)"
+                  value={form.qualification}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+                />
+                <input
+                  type="text"
+                  name="workplace"
+                  placeholder="Current Workplace / Hospital / Pharmacy"
+                  value={form.workplace}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+                />
+                <div>
+                  <label className="text-sm text-gray-200 block mb-1">
+                    Upload Verification Document (ID / License Proof)
+                  </label>
+                  <input
+                    type="file"
+                    name="verificationDoc"
+                    accept=".pdf,.jpg,.png"
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        verificationDoc: e.target.files?.[0]?.name || "",
+                      })
+                    }
+                    className="w-full p-2 rounded-md bg-white/30 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-400"
+                    required
+                  />
+                </div>
+              </>
+            )}
+
+            {/* ✅ Universal Confirmation Checkbox */}
+            <div className="flex items-start space-x-2">
               <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                className="w-full p-3 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-green-400"
-                value={form.password}
+                type="checkbox"
+                name="confirmInfo"
+                checked={form.confirmInfo}
                 onChange={handleChange}
                 required
-                minLength={8}
-                maxLength={20}
+                className="mt-1"
               />
-              <p className="text-xs text-gray-200 mt-1">
-                Password must be 8–20 characters long.
-              </p>
+              <label className="text-sm text-gray-200 leading-tight">
+                I hereby declare that all the information provided above is true
+                and accurate to the best of my knowledge.
+              </label>
             </div>
 
             {/* Submit Button */}

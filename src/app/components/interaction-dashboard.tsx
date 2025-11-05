@@ -372,14 +372,6 @@ export function InteractionDashboard() {
                         onChange={(e) => setNewDrugName(e.target.value)}
                         disabled={isLoading}
                       />
-                      <Label htmlFor="new-rx-number">RX Number</Label>
-                      <Input
-                        id="new-rx-number"
-                        placeholder="e.g., RX123456"
-                        value={newRxNumber}
-                        onChange={(e) => setNewRxNumber(e.target.value)}
-                        disabled={isLoading}
-                      />
                       <Label htmlFor="new-doctor">Doctor</Label>
                       <Input
                         id="new-doctor"

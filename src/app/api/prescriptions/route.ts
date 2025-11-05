@@ -9,15 +9,13 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const username = searchParams.get("username");
-  const patientUsername = searchParams.get("patientUsername");
   const doctorId = searchParams.get("doctorId");
   const pharmacyId = searchParams.get("pharmacyId");
 
   const query: any = {};
 
-  // 🔹 support both username and patientUsername
-  if (username || patientUsername)
-    query.username = username || patientUsername;
+  // 🔹 Support username filtering
+  if (username) query.username = username;
   if (doctorId) query.doctorId = doctorId;
   if (pharmacyId) query.pharmacyId = pharmacyId;
 
@@ -32,7 +30,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const {
-      username,        // 👈 used instead of patientId
+      username,        // 👈 patient username
       patientName,
       doctorId,
       doctorName,
@@ -43,7 +41,7 @@ export async function POST(req: Request) {
       form,
       refills,
       noteForPharmacist,
-      pharmacyId,      // optional
+      pharmacyId,
     } = body;
 
     if (!username || !patientName) {

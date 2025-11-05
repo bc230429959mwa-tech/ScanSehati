@@ -4,7 +4,7 @@ const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true, // keep username globally unique
+    unique: true, // globally unique
   },
   fullName: {
     type: String,
@@ -24,13 +24,43 @@ const UserSchema = new mongoose.Schema({
     enum: ["doctor", "pharmacist", "patient"],
     required: true,
   },
+
+  // 🔹 Common optional unique userId (future extension)
   userId: {
-    type: String, // patientId or doctorId (custom id)
+    type: String,
     unique: true,
+    sparse: true,
+  },
+
+  // 🔹 Patient-specific
+  dob: {
+    type: Date,
+  },
+  confirmInfo: {
+    type: Boolean,
+  },
+
+  // 🔹 Doctor / Pharmacist fields
+  licenseNumber: {
+    type: String,
+  },
+  qualification: {
+    type: String,
+  },
+  workplace: {
+    type: String,
+  },
+  verificationDoc: {
+    type: String, // store filename or URL
+  },
+
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
-// ✅ Compound unique index: same email can exist across roles, but not within the same role
+// ✅ Email can repeat across roles, but not within same role
 UserSchema.index({ email: 1, role: 1 }, { unique: true });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

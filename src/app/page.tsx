@@ -86,7 +86,8 @@ export default function HomePage() {
             alt="AI Healthcare Illustration"
             width={550}
             height={550}
-            className="drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]" // Slightly stronger glow
+            className="drop-shadow-[0_0_40px_rgba(34,197,94,0.4)] border-radius rounded-lg"
+   // Slightly stronger glow
           />
         </motion.div>
       </section>
