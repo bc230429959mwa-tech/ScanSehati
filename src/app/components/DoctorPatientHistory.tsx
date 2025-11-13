@@ -293,7 +293,7 @@ const DoctorPatientHistory: React.FC<DoctorPatientHistoryProps> = ({
                         <span className="font-medium text-gray-600">Email:</span> {patientDetails?.email || 'N/A'}
                     </p>
                     <p>
-                        <span className="font-medium text-gray-600">Date of Birth:</span> {patientDetails?.dob || 'N/A'}
+                        <span className="font-medium text-gray-600">Date of Birth:</span> {patientDetails?.dob ? new Date(patientDetails.dob).toLocaleDateString() : 'N/A'}
                     </p>
                 </div>
             </div>
