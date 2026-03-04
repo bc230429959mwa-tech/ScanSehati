@@ -1,5 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import User from "@/models/User";
+import { connectToDatabase } from "@/lib/mongodb";
 
 // Extend NextAuth types so TypeScript knows our session always has a user + role
 declare module "next-auth" {
@@ -40,32 +43,41 @@ export const authOptions: NextAuthOptions = {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) return null;
+        if (!credentials?.username || !credentials?.password) {
+          throw new Error("Missing credentials");
+        }
 
-        const baseUrl =
-          process.env.NEXTAUTH_URL ||
-          (typeof window !== "undefined" ? "" : "http://localhost:3000");
+        // ✅ Connect to DB
+        await connectToDatabase();
 
-        const res = await fetch(`${baseUrl}/api/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: credentials.username,
-            password: credentials.password,
-          }),
-        });
+        // ✅ Find user
+        const user = await User.findOne({
+          username: credentials.username,
+        }).select("+password");
 
-        const data = await res.json();
-        if (!res.ok || !data.user) throw new Error(data.error || "Login failed");
+        if (!user) {
+          throw new Error("Invalid username");
+        }
 
-        // ✅ Return the full user object including role
+        // ✅ Compare password
+        const isMatch = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!isMatch) {
+          throw new Error("Invalid credentials");
+        }
+
+        // ✅ Return safe user object
         return {
-          id: data.user._id,
-          name: data.user.username,
-          email: data.user.email,
-          fullName: data.user.fullName,
-          role: data.user.role,
+          id: user._id.toString(),
+          name: user.username,
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role,
         };
       },
     }),
@@ -73,9 +85,12 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "jwt",
-    maxAge: 60 * 60, // 15 minute
+    maxAge: 60 * 60, // 1 hour
   },
-  jwt: { maxAge: 60 * 60 },
+
+  jwt: {
+    maxAge: 60 * 60,
+  },
 
   secret: process.env.NEXTAUTH_SECRET,
 
@@ -85,23 +100,23 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-        token.fullName = (user as any).fullName;
-        token.role = (user as any).role;
+        token.fullName = user.fullName;
+        token.role = user.role;
       }
       return token;
     },
 
     async session({ session, token }) {
-      // ✅ Type-safe: we’ve declared session.user as required above
-      session.user.id = token.id;
-      session.user.name = token.name;
-      session.user.email = token.email;
-      session.user.fullName = token.fullName;
-      session.user.role = token.role;
+      session.user = {
+        id: token.id,
+        name: token.name,
+        email: token.email,
+        fullName: token.fullName,
+        role: token.role,
+      };
       return session;
     },
 
-    // Optional: handle redirects cleanly
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (url.startsWith(baseUrl)) return url;
