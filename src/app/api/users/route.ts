@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Role is required" }, { status: 400 });
     }
 
-    const users = await User.find({ role }).select("username fullName");
+    const users = await User.find({ role }).select("username fullName qualification");
     return NextResponse.json(users);
   } catch (err) {
     console.error(err);

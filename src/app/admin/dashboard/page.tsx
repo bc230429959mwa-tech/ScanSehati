@@ -11,6 +11,7 @@ interface ContactMessage {
   message: string;
   fromEmail?: string;
   createdAt: string;
+  name: string;
 }
 
 export default function AdminDashboard() {
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <p className="font-semibold text-gray-800 flex items-center gap-2">
-                        {msg.fromEmail || "Anonymous"}
+                        {msg.name || "Anonymous"}
                       </p>
                       {msg.fromEmail && (
                         <p className="text-sm text-gray-500 flex items-center gap-1">

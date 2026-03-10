@@ -37,6 +37,11 @@ export default function SignupPage() {
       return;
     }
 
+    if (form.username.includes(" ")) {
+      setError("Username cannot contain spaces.");
+      return;
+    }
+
     if (form.password.length < 8 || form.password.length > 20) {
       setError("Password must be between 8 and 20 characters long.");
       return;
@@ -206,7 +211,7 @@ export default function SignupPage() {
                 <input
                   type="text"
                   name="qualification"
-                  placeholder="Qualification (e.g., MBBS, Pharm.D)"
+                  placeholder="Qualification (Specilization)"
                   value={form.qualification}
                   onChange={handleChange}
                   required

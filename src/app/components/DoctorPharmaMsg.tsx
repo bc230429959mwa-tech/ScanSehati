@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 interface Pharmacist {
   username: string;
   fullName: string;
+  qualification: string;
 }
 
 interface Message {
@@ -237,12 +238,12 @@ useEffect(() => {
               <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-md">
                 {filteredPharmacists.map((p) => (
                   <li
-                    key={p.username}
+                    key={p.qualification}
                     onClick={() => handleSelect(p)}
                     className="px-3 py-2 hover:bg-indigo-100 cursor-pointer"
                   >
                     {p.fullName}{" "}
-                    <span className="text-gray-500 text-sm">({p.username})</span>
+                    <span className="text-gray-500 text-sm">({p.qualification})</span>
                   </li>
                 ))}
               </ul>

@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 interface Doctor {
   username: string;
   fullName: string;
+  qualification: string;
 }
 
 interface Message {
@@ -232,11 +233,11 @@ const PharmaDocMsg: React.FC = () => {
               <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-md">
                 {filteredDoctors.map((d) => (
                   <li
-                    key={d.username}
+                    key={d.qualification}
                     onClick={() => handleSelect(d)}
                     className="px-3 py-2 hover:bg-blue-100 cursor-pointer"
                   >
-                    {d.fullName} <span className="text-gray-500 text-sm">({d.username})</span>
+                    {d.fullName} <span className="text-gray-500 text-sm">({d.qualification})</span>
                   </li>
                 ))}
               </ul>

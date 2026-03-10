@@ -11,6 +11,7 @@ interface Doctor {
   _id: string;
   username: string;
   fullName: string;
+  qualification:string;
 }
 
 interface PatientMessageProps {
@@ -85,7 +86,7 @@ const PatientMessage: React.FC<PatientMessageProps> = ({ patientUsername }) => {
           >
             {doctors.map((doc) => (
               <option key={doc._id} value={doc.username}>
-                Dr. {doc.fullName} ({doc.username})
+                {doc.fullName} - {doc.qualification}
               </option>
             ))}
           </select>

@@ -46,20 +46,21 @@ const PharmacistDashboard: React.FC = () => {
     });
     if (res.ok) {
       setPrescriptions((prev) =>
-        prev.map((p) => (p.uuid === uuid ? { ...p, status } : p))
+        prev.map((p) => (p.uuid === uuid ? { ...p, status, pharmacyId } : p))
       );
     }
   };
 
   useEffect(() => {
-    fetch(`/api/prescriptions?pharmacyId=${pharmacyId}`)
+    // Fetch all prescriptions for pharmacists (both assigned and unassigned)
+    fetch(`/api/prescriptions?includeUnassigned=true`)
       .then((res) => res.json())
       .then((data) => {
         setPrescriptions(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [pharmacyId]);
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
@@ -80,7 +81,7 @@ const PharmacistDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-7xl mx-auto space-y-10">
+      <div className="w-full max-w-[100%] sm:max-w-2xl lg:max-w-4xl mx-auto space-y-10">
         {/* Header */}
         <header className="text-center space-y-2 pt-4 pb-2 bg-white rounded-2xl shadow-lg border border-gray-100">
           <h1 className="text-4xl font-extrabold text-teal-700 tracking-tight">
@@ -105,98 +106,126 @@ const PharmacistDashboard: React.FC = () => {
             />
           </div>
 
-          {/* Table */}
-          <div className="hidden md:block overflow-x-auto w-full">
-            <table className="min-w-full text-sm divide-y divide-gray-200">
-              <thead>
-                <tr className="bg-teal-50 text-teal-800 text-left font-semibold uppercase tracking-wider">
-                  <th className="p-2">Rx #</th>
-                  <th className="p-2">Patient</th>
-                  <th className="p-2">Drug</th>
-                  <th className="p-2 hidden lg:table-cell">Dosage</th>
-                  <th className="p-2 hidden md:table-cell">Qty</th>
-                  <th className="p-2 hidden xl:table-cell">Freq</th>
-                  <th className="p-2 hidden xl:table-cell">Doctor</th>
-                  <th className="p-2">Status</th>
-                  <th className="p-2 hidden lg:table-cell">Note</th>
-                  <th className="p-2 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filtered.map((rx, i) => (
-                  <tr
-                    key={rx.uuid}
-                    onClick={() =>
-                      setSelectedPatientUsername((prev) =>
-                        prev === rx.username ? null : rx.username
-                      )
-                    }
-                    className={`cursor-pointer transition ${
-                      selectedPatientUsername === rx.username
-                        ? 'bg-blue-100 ring-2 ring-teal-400'
-                        : i % 2 === 0
-                        ? 'bg-white hover:bg-gray-50'
-                        : 'bg-gray-50 hover:bg-gray-100'
-                    }`}
-                  >
-                    <td className="p-2 font-mono font-medium text-teal-600">
-                      {rx.rxNumber}
-                    </td>
-                    <td className="p-2 font-medium text-gray-800">{rx.patientName}</td>
-                    <td className="p-2 text-gray-700">{rx.drug}</td>
-                    <td className="p-2 hidden lg:table-cell">{rx.dosage}</td>
-                    <td className="p-2 hidden md:table-cell">
-                      {rx.pills} ({rx.form})
-                    </td>
-                    <td className="p-2 hidden xl:table-cell">{rx.frequency}</td>
-                    <td className="p-2 hidden xl:table-cell">Dr. {rx.doctorName}</td>
-                    <td className="p-2">
-                      <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClasses(
-                          rx.status
-                        )}`}
-                      >
-                        {rx.status}
-                      </span>
-                    </td>
-                    <td className="p-2 hidden lg:table-cell text-gray-500 italic max-w-xs truncate">
-                      {rx.noteForPharmacist || '-'}
-                    </td>
-                    <td className="p-2 text-right space-x-1">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateStatus(rx.uuid, 'Ready');
-                        }}
-                        className="p-1 rounded-full text-green-600 hover:bg-green-100"
-                      >
-                        <PackageCheck size={18} />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateStatus(rx.uuid, 'PickedUp');
-                        }}
-                        className="p-1 rounded-full text-blue-600 hover:bg-blue-100"
-                      >
-                        <CheckCircle size={18} />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateStatus(rx.uuid, 'Cancelled');
-                        }}
-                        className="p-1 rounded-full text-red-600 hover:bg-red-100"
-                      >
-                        <XCircle size={18} />
-                      </button>
-                    </td>
+          {/* Table View - All Screen Sizes */}
+          <div className="w-full overflow-auto border border-gray-200 rounded-lg max-h-[500px]">
+            {filtered.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                No prescriptions found matching your search.
+              </div>
+            ) : (
+              <table className="w-full text-xs sm:text-sm divide-y divide-gray-200">
+                <thead className="bg-teal-50 text-teal-800 text-left font-semibold uppercase tracking-wider sticky top-0">
+                  <tr>
+                    <th className="p-1.5 sm:p-2 whitespace-nowrap">Rx #</th>
+                    <th className="p-1.5 sm:p-2 whitespace-nowrap">Patient</th>
+                    <th className="p-1.5 sm:p-2 whitespace-nowrap">Drug</th>
+                    <th className="p-1.5 sm:p-2 hidden sm:table-cell whitespace-nowrap">Dosage</th>
+                    <th className="p-1.5 sm:p-2 hidden md:table-cell whitespace-nowrap">Qty</th>
+                    <th className="p-1.5 sm:p-2 hidden lg:table-cell whitespace-nowrap">Freq</th>
+                    <th className="p-1.5 sm:p-2 hidden lg:table-cell whitespace-nowrap">Doctor</th>
+                    <th className="p-1.5 sm:p-2 whitespace-nowrap">Status</th>
+                    <th className="p-1.5 sm:p-2 hidden md:table-cell whitespace-nowrap">Note</th>
+                    <th className="p-1.5 sm:p-2 text-right whitespace-nowrap">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody className="divide-y divide-gray-100">
+                  {filtered.map((rx, i) => (
+                    <tr
+                      key={rx.uuid}
+                      onClick={() =>
+                        setSelectedPatientUsername((prev) =>
+                          prev === rx.username ? null : rx.username
+                        )
+                      }
+                      className={`cursor-pointer transition ${
+                        selectedPatientUsername === rx.username
+                          ? 'bg-blue-100 ring-1 ring-teal-400'
+                          : i % 2 === 0
+                          ? 'bg-white hover:bg-gray-50'
+                          : 'bg-gray-50 hover:bg-gray-100'
+                      }`}
+                    >
+                      <td className="p-1.5 sm:p-2 font-mono text-teal-600 whitespace-nowrap">
+                        {rx.rxNumber}
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 font-medium text-gray-800 whitespace-nowrap">
+                        {rx.patientName}
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 text-gray-700 whitespace-nowrap">
+                        {rx.drug}
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 hidden sm:table-cell whitespace-nowrap">
+                        {rx.dosage}
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 hidden md:table-cell whitespace-nowrap">
+                        {rx.pills} ({rx.form})
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 hidden lg:table-cell whitespace-nowrap">
+                        {rx.frequency}
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 hidden lg:table-cell whitespace-nowrap">
+                        Dr. {rx.doctorName}
+                      </td>
+
+                      <td className="p-1.5 sm:p-2">
+                        <span
+                          className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeClasses(
+                            rx.status
+                          )}`}
+                        >
+                          {rx.status}
+                        </span>
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 hidden md:table-cell text-gray-500 italic max-w-[150px] sm:max-w-[200px] truncate">
+                        {rx.noteForPharmacist || '-'}
+                      </td>
+
+                      <td className="p-1.5 sm:p-2 text-right whitespace-nowrap space-x-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateStatus(rx.uuid, 'Ready');
+                          }}
+                          className="p-1 sm:p-1.5 rounded-full text-green-600 hover:bg-green-100"
+                        >
+                          <PackageCheck size={16} />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateStatus(rx.uuid, 'PickedUp');
+                          }}
+                          className="p-1 sm:p-1.5 rounded-full text-blue-600 hover:bg-blue-100"
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateStatus(rx.uuid, 'Cancelled');
+                          }}
+                          className="p-1 sm:p-1.5 rounded-full text-red-600 hover:bg-red-100"
+                        >
+                          <XCircle size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-        </div>
+</div>
 
         {/* Patient History Section */}
         {selectedPatientUsername && (

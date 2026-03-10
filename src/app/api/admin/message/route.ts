@@ -10,6 +10,7 @@ export async function GET() {
 
     const messages = rawMessages.map((m) => ({
       _id: m._id.toString(),
+      name: m.name,
       message: m.message,
       fromEmail: m.fromEmail,
       createdAt: m.createdAt,

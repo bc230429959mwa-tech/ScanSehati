@@ -3,7 +3,7 @@ import Prescription from "@/models/Prescription";
 import { connectToDatabase } from "@/lib/mongodb";
 import crypto from "crypto";
 
-// ✅ GET /api/prescriptions?username=xxx&doctorId=xxx&pharmacyId=xxx
+// ✅ GET /api/prescriptions?username=xxx&doctorId=xxx&pharmacyId=xxx&includeUnassigned=true
 export async function GET(req: Request) {
   await connectToDatabase();
   const { searchParams } = new URL(req.url);
@@ -11,13 +11,30 @@ export async function GET(req: Request) {
   const username = searchParams.get("username");
   const doctorId = searchParams.get("doctorId");
   const pharmacyId = searchParams.get("pharmacyId");
+  const includeUnassigned = searchParams.get("includeUnassigned") === "true";
 
   const query: any = {};
 
   // 🔹 Support username filtering
   if (username) query.username = username;
   if (doctorId) query.doctorId = doctorId;
-  if (pharmacyId) query.pharmacyId = pharmacyId;
+  
+  // 🔹 Handle pharmacyId filtering
+  if (pharmacyId) {
+    if (pharmacyId === "null") {
+      // Fetch prescriptions with no pharmacyId assigned
+      query.$or = [
+        { pharmacyId: { $exists: false } },
+        { pharmacyId: null },
+        { pharmacyId: "" }
+      ];
+    } else {
+      query.pharmacyId = pharmacyId;
+    }
+  } else if (includeUnassigned) {
+    // If no pharmacyId specified but includeUnassigned is true, fetch all
+    // This allows pharmacists to see all prescriptions
+  }
 
   const prescriptions = await Prescription.find(query).sort({ createdAt: -1 });
   return NextResponse.json(prescriptions);
