@@ -8,7 +8,14 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Textarea } from '@/app/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronDown, XCircle } from "lucide-react";
+
+  interface FAQ {
+  q: string;
+  a: string;
+  tag: string;
+  tagColor: string;
+}
 
 export default function HelpPage() {
   // state for form
@@ -55,6 +62,126 @@ export default function HelpPage() {
     }
   }
 
+
+
+// Post-login FAQs: practical usage questions from existing logged-in users
+const faqs: FAQ[] = [
+  {
+    q: "How do I run a drug interaction check on my current prescriptions?",
+    a: "Go to your dashboard and tap 'Check Interactions' on any prescription card. You can also add extra medications — like OTC drugs or vitamins you take — and the AI will check all of them together at once. Results are graded as minor, moderate, or major.",
+    tag: "Using the Checker",
+    tagColor: "bg-blue-50 text-blue-700",
+  },
+  {
+    q: "I got a drug interaction alert — what should I do next?",
+    a: "Don't panic. Read the alert detail — it will tell you the severity level and what the specific risk is. For minor alerts, your doctor may have already accounted for it. For moderate or major alerts, use the 'Message Doctor' button on the alert screen to contact your prescribing doctor directly through ScanSehati before taking the medication.",
+    tag: "Interaction Alerts",
+    tagColor: "bg-amber-50 text-amber-700",
+  },
+  {
+    q: "Can I add my own vitamins and supplements to the interaction checker?",
+    a: "Yes. In the interaction checker, tap '+ Add Medication' and search for any supplement — vitamin D, magnesium, fish oil, St. John's Wort, melatonin, and hundreds more are in our database. The AI checks them against all your current prescriptions.",
+    tag: "Supplements & OTC",
+    tagColor: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    q: "My doctor sent a new prescription — where do I find it?",
+    a: "You'll get a push notification and an in-app notification instantly. It also appears at the top of your 'Active Prescriptions' list on your dashboard. Tap it to see full details including dosage, duration, and your doctor's instructions.",
+    tag: "Prescriptions",
+    tagColor: "bg-violet-50 text-violet-700",
+  },
+  {
+    q: "How do I share my prescription history with a new doctor?",
+    a: "Go to Profile → Medical Records → Share Records. You can generate a secure, time-limited share link or send it directly to a doctor's ScanSehati account. You control exactly which prescriptions and records are included.",
+    tag: "Sharing Records",
+    tagColor: "bg-blue-50 text-blue-700",
+  },
+  {
+    q: "Can the pharmacist see my prescription without me showing anything?",
+    a: "Yes — once your doctor sends a prescription, your connected pharmacy receives it automatically. Your pharmacist can view and verify it on their dashboard. You don't need to print or carry anything. You'll be notified when they mark it 'Ready for Pickup'.",
+    tag: "Pharmacy",
+    tagColor: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    q: "I take 5+ medications daily. Will the checker handle all of them at once?",
+    a: "Absolutely — this is one of ScanSehati's core strengths. The AI checks all your medications simultaneously against each other, not just pairs. This is especially important for polypharmacy patients. Add every drug, supplement, and OTC medicine you take for the most complete safety picture.",
+    tag: "Polypharmacy",
+    tagColor: "bg-amber-50 text-amber-700",
+  },
+  {
+    q: "How do I set a reminder to take my medication?",
+    a: "Open any active prescription and tap 'Set Reminder'. You can set custom times, multiple reminders per day, and choose between push notifications or SMS. Reminders can be paused or edited anytime from the Reminders section in your dashboard.",
+    tag: "Reminders",
+    tagColor: "bg-violet-50 text-violet-700",
+  },
+  {
+    q: "Can I message my doctor or pharmacist directly through ScanSehati?",
+    a: "Yes. Every prescription card has a 'Message' button. You can send a message directly to the prescribing doctor or your linked pharmacist. All messages are stored securely in the conversation thread attached to that prescription.",
+    tag: "Messaging",
+    tagColor: "bg-blue-50 text-blue-700",
+  },
+  {
+    q: "Is my medical data safe? Who can see my prescriptions?",
+    a: "Your data is end-to-end encrypted. Only doctors and pharmacists you have explicitly authorized can view your prescriptions. You can review and revoke access at any time from Profile → Privacy & Access. ScanSehati never sells or shares your health data.",
+    tag: "Privacy & Security",
+    tagColor: "bg-emerald-50 text-emerald-700",
+  },
+];
+
+// ─── FAQ Item ─────────────────────────────────────────────────────────────────
+
+function FAQItem({ faq, index }: { faq: FAQ; index: number }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="border-b border-slate-100 last:border-0">
+      <button
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        className="w-full flex items-start justify-between gap-4 py-5 text-left group"
+      >
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <span
+            className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold mt-0.5 transition-all duration-200 ${
+              open
+                ? "bg-blue-600 text-white"
+                : "bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600"
+            }`}
+          >
+            {index + 1}
+          </span>
+          <span
+            className={`text-[15px] font-medium leading-snug transition-colors duration-200 ${
+              open ? "text-blue-700" : "text-slate-800 group-hover:text-blue-600"
+            }`}
+          >
+            {faq.q}
+          </span>
+        </div>
+        <ChevronDown 
+          size={17}
+          className={`flex-shrink-0 mt-0.5 text-slate-400 transition-transform duration-300 ${
+            open ? "rotate-180 text-blue-500" : ""
+          }`}
+        />
+      </button>
+
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="pb-5 pl-9">
+          <p className="text-sm text-slate-600 leading-relaxed mb-3">{faq.a}</p>
+          <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${faq.tagColor}`}>
+            {faq.tag}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
   return (
     <main className="flex-1 p-4 md:p-8 text-left">
       <div className="space-y-8">
@@ -67,105 +194,122 @@ export default function HelpPage() {
 
         <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
           {/* FAQ section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Frequently Asked Questions (FAQ)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>Is MediCheck AI a substitute for professional medical advice?</AccordionTrigger>
-                  <AccordionContent>
-                    No. MediCheck AI is a tool to help you understand potential drug interactions but it is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>How accurate is the interaction checker?</AccordionTrigger>
-                  <AccordionContent>
-                    Our AI-powered interaction checker is designed to be highly accurate based on current medical literature and data. However, it's a supportive tool and the final decision should always be made by a healthcare professional.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger>How do I upload a prescription?</AccordionTrigger>
-                  <AccordionContent>
-                    Navigate to the "Interaction Checker" page and select the "Upload Prescription" tab. You can then select an image of your prescription. Our AI will automatically extract the drug names for you to check.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-4">
-                  <AccordionTrigger>Is my data secure?</AccordionTrigger>
-                  <AccordionContent>
-                    Yes, we take data privacy and security very seriously. All data is encrypted, and we follow strict protocols to ensure your information is protected.
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </CardContent>
-          </Card>
+           {/* ── FAQ Section ── */}
+        <section aria-label="Frequently asked questions" className="mb-12">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-800 mb-1 flex items-center gap-2">
+              <span className="w-1 h-5 bg-emerald-500 rounded-full inline-block" />
+              FAQs
+            </h2>
+            <p className="text-sm text-slate-500 ml-3">
+              Practical answers for everything you'll need.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 sm:px-6 divide-y-0">
+            {faqs.map((faq, i) => (
+              <FAQItem key={i} faq={faq} index={i} />
+            ))}
+          </div>
+        </section>
 
           {/* Contact Support Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Support</CardTitle>
-              <CardDescription>Can't find an answer? Reach out to our team.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="Your Name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    placeholder="How can we help you?"
-                    rows={5}
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    required
-                    maxLength={300}
-                  />
-                </div>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Sending..." : "Send Message"}
-                </Button>
+          {/* ── Contact Section (FAQ Style) ── */}
+<section aria-label="Contact support">
+  <div className="mb-6">
+    <h2 className="text-xl font-bold text-slate-800 mb-1 flex items-center gap-2">
+      <span className="w-1 h-5 bg-blue-500 rounded-full inline-block" />
+      Contact Support
+    </h2>
+    <p className="text-sm text-slate-500 ml-3">
+      Can't find an answer? Send us a message.
+    </p>
+  </div>
 
-                {/* success alert */}
-                {status === "success" && (
-                  <Alert className="mt-4">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <AlertTitle>Message Sent</AlertTitle>
-                    <AlertDescription>{message}</AlertDescription>
-                  </Alert>
-                )}
+  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 sm:px-6 py-6">
+    <form className="space-y-5" onSubmit={handleSubmit}>
+      
+      {/* Name */}
+      <div className="space-y-2">
+        <Label htmlFor="name">Name</Label>
+        <Input
+          id="name"
+          placeholder="Your Name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          className="h-10"
+          required
+        />
+      </div>
 
-                {/* error alert */}
-                {status === "error" && (
-                  <Alert className="mt-4" variant="destructive">
-                    <XCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{message}</AlertDescription>
-                  </Alert>
-                )}
-              </form>
-            </CardContent>
-          </Card>
+      {/* Email */}
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="your@email.com"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          className="h-10"
+          required
+        />
+      </div>
+
+      {/* Message */}
+      <div className="space-y-2">
+        <Label htmlFor="message">Message</Label>
+        <Textarea
+          id="message"
+          placeholder="How can we help you?"
+          rows={5}
+          value={form.message}
+          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          className="resize-none"
+          required
+          maxLength={300}
+        />
+        <p className="text-xs text-slate-400 text-right">
+          {form.message.length}/300
+        </p>
+      </div>
+
+      {/* Button */}
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full h-10 text-sm font-semibold"
+      >
+        {loading ? "Sending..." : "Send Message"}
+      </Button>
+
+      {/* Alerts */}
+      {status === "success" && (
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+          <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-emerald-700">
+              Message Sent
+            </p>
+            <p className="text-sm text-emerald-600">{message}</p>
+          </div>
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3">
+          <XCircle className="h-4 w-4 text-red-600 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-red-700">
+              Error
+            </p>
+            <p className="text-sm text-red-600">{message}</p>
+          </div>
+        </div>
+      )}
+    </form>
+  </div>
+</section>
         </div>
       </div>
     </main>
