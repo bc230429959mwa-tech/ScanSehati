@@ -443,7 +443,7 @@ export default function HomePage() {
         >
           <Link href="/" className="flex items-center gap-2.5 no-underline group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-base shadow-md shadow-blue-200">
-              <img src="/Capture.png" alt="ScanSehati Logo" className="w-5 h-5" />
+              <img src="/capture.png" alt="ScanSehati Logo" className="w-5 h-5" />
             </div>
             <span className="font-['Syne',sans-serif] font-extrabold text-xl tracking-tight text-slate-900">
               ScanSehati
@@ -852,7 +852,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/6 mb-8">
               <div>
                 <Link href="/" className="flex items-center gap-2.5 no-underline mb-4">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-base"><img src="/Capture.png" alt="ScanSehati Logo" className="w-5 h-5" /></div>
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-base"><img src="/capture.png" alt="ScanSehati Logo" className="w-5 h-5" /></div>
                   <span className="font-['Syne',sans-serif] font-extrabold text-xl text-white tracking-tight">
                     ScanSehati
                   </span>
